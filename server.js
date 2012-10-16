@@ -32,7 +32,17 @@ net.createServer(function(sock) {
         addNewServer(server);
         console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
       } else if (data.readInt8(0) == 2) {   //list online packet
-			 console.log('list online' + converter.convert(connections));
+            // sending list of servers:
+            var tempServer = serverForSocket(sock);
+            var listOfServers = converter.convert(connections);
+
+            // form data to send:
+            dataOfListBuffer = new Buffer(listOfServers.length+1);
+            dataOfListBuffer[0] = 2;
+            dataOfListBuffer.write(listOfServers, 1);
+
+            tempServer.socket.write(dataOfListBuffer);
+			console.log('list online' + converter.convert(connections));
 		  } else if (data.readInt8(0) == 3) {    //set pair server packet
 			 console.log('set pair socket ' + data.toString('utf8', 4));
 			 var name = data.toString('utf8', 4);
@@ -40,9 +50,9 @@ net.createServer(function(sock) {
 			 var pairServer = serverForName(name);
 			 if (pairServer) {
 				pairServer.pairSocket = sock;
-        pairServer.status = 'B';
+                pairServer.status = 'B';
 				tempServer.pairSocket = pairServer.socket;
-        tempServer.status = 'B';
+                tempServer.status = 'B';
 			 }
 			 else console.log('cannot find pair server for name ' + name);
 			

@@ -16,37 +16,40 @@ net.createServer(function(sock) {
 
     // We have a connection - a socket object is assigned to the connection automatically
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-    var server = {}
-    server.socket = sock;
-    server.serverName = sock.remoteAddress;
-    server.status = "A";
-    addNewServer(server);
-    console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
+    
 
     sock.on('data', function(data) {
-        if (data.readInt8(0) == 0){ 
-			//console.log('get ping packet');
-			console.log('get ping packet ' + data); 
-		}else if (data.readInt8(0) == 1) {
-			console.log('list online' + converter.convert(connections));
-		}
-		else if (data.readInt8(0) == 2){
-			console.log('set pair socket ' + data.toString('utf8', 4, 16));
-			var name = data.toString('utf8', 4, 16);
-			var tempServer = serverForSocket(sock);
-			var pairServer = serverForName(name);
-			if (pairServer) {
+      if (data.readInt8(0) == 0){       //ping packet
+			 console.log('get ping packet'); 
+		  } else if (data.readInt8(0) == 1) {   //info packet
+        console.log('data info ' + data);
+        var server = {}
+        server.socket = sock;
+        server.money = data.readInt8(4,4);
+        server.rank = data.readInt8(8,4);
+        server.serverName = data.toString('utf8', 12);
+        server.status = "A";
+        addNewServer(server);
+        console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
+      } else if (data.readInt8(0) == 2) {   //list online packet
+			 console.log('list online' + converter.convert(connections));
+		  } else if (data.readInt8(0) == 3) {    //set pair server packet
+			 console.log('set pair socket ' + data.toString('utf8', 4, 16));
+			 var name = data.toString('utf8', 4, 16);
+			 var tempServer = serverForSocket(sock);
+			 var pairServer = serverForName(name);
+			 if (pairServer) {
 				pairServer.pairSocket = sock;
 				tempServer.pairSocket = pairServer.socket;
-			}
-			else console.log('cannot find pair server for name ' + name);
+			 }
+			 else console.log('cannot find pair server for name ' + name);
 			
-		} else if (data.readInt8(0) > 2){
-			console.log('send data to client ' + data);
-			tempServer = serverForSocket(sock);
-			if (tempServer.pairSocket) tempServer.pairSocket.write(data);
-			else console.log('pair socket does not set');
-		}
+		  } else if (data.readInt8(0) > 3){   //worked packet
+			 console.log('send data to client ' + data);
+			 tempServer = serverForSocket(sock);
+			 if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+			 else console.log('pair socket does not set');
+		  }
 	
     });
     

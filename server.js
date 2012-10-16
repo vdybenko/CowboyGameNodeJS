@@ -27,24 +27,26 @@ net.createServer(function(sock) {
         server.socket = sock;
         server.money = data.readInt8(4,4);
         server.rank = data.readInt8(8,4);
-        server.serverName = data.toString('utf8', 12);
+        server.serverName = data.toString('utf8', 12, data.length);
         server.status = "A";
         addNewServer(server);
         console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
       } else if (data.readInt8(0) == 2) {   //list online packet
 			 console.log('list online' + converter.convert(connections));
 		  } else if (data.readInt8(0) == 3) {    //set pair server packet
-			 console.log('set pair socket ' + data.toString('utf8', 4, 16));
-			 var name = data.toString('utf8', 4, 16);
+			 console.log('set pair socket ' + data.toString('utf8', 4));
+			 var name = data.toString('utf8', 4);
 			 var tempServer = serverForSocket(sock);
 			 var pairServer = serverForName(name);
 			 if (pairServer) {
 				pairServer.pairSocket = sock;
+        pairServer.status = 'B';
 				tempServer.pairSocket = pairServer.socket;
+        tempServer.status = 'B';
 			 }
 			 else console.log('cannot find pair server for name ' + name);
 			
-		  } else if (data.readInt8(0) > 3){   //worked packet
+		  } else if (data.readInt8(0) > 4){   //worked packet
 			 console.log('send data to client ' + data);
 			 tempServer = serverForSocket(sock);
 			 if (tempServer.pairSocket) tempServer.pairSocket.write(data);
@@ -101,6 +103,11 @@ function addNewServer(server)
 
 function removeServerFromList(server)
 {
+  if (server.pairSocket) {
+    var buffer = new Buffer();
+    buffer[0] = 4;
+    server.pairSocket;
+  }
    var index;
    index = connections.indexOf(server);
    connections.splice(index, 1);

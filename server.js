@@ -1,4 +1,5 @@
 var net = require('net');
+var converter = require('./converter');
 
 var connections = new Array();
 
@@ -17,17 +18,41 @@ net.createServer(function(sock) {
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
     var server = {}
     server.socket = sock;
-    server.serverName = "test server ip" + sock.remoteAddress;
-    server.status = "A"; 
+    server.serverName = sock.remoteAddress;
+    server.status = "A";
     addNewServer(server);
     console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
 
     sock.on('data', function(data) {
-        //console.log('get packet id %d', data.readInt8(0));
-        if(data.readInt8(0) == 0) console.log('get ping packet');
-        else sendDataToServerWithName(connections[0].serverName);
+        if (data.readInt8(0) == 0){ 
+			//console.log('get ping packet');
+			console.log('get ping packet ' + data); 
+		}else if (data.readInt8(0) == 1) {
+			console.log('list online' + converter.convert(connections));
+		}
+		else if (data.readInt8(0) == 2){
+			console.log('set pair socket ' + data.toString('utf8', 4, 16));
+			var name = data.toString('utf8', 4, 16);
+			var tempServer = serverForSocket(sock);
+			var pairServer = serverForName(name);
+			if (pairServer) {
+				pairServer.pairSocket = sock;
+				tempServer.pairSocket = pairServer.socket;
+			}
+			else console.log('cannot find pair server for name ' + name);
+			
+		} else if (data.readInt8(0) > 2){
+			console.log('send data to client ' + data);
+			tempServer = serverForSocket(sock);
+			if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+			else console.log('pair socket does not set');
+		}
+	
     });
     
+	sock.on('drain', function(){
+		console.log('drain!');	
+	});
     // Add a 'timeout' event handler to this instance of socket
     sock.on('timeout', function(data) {
         console.log('TIMEOUT: ' + sock.remoteAddress +' '+ sock.remotePort);
@@ -46,7 +71,7 @@ function serverForName(name){
    for (i = 0; i < connections.length; i++){
       var server = connections[i];
       if (server.serverName === name) return server;
-      console.log('serverForName: ' + server.socket.remoteAddress + ': ' + i);
+      console.log('serverForName: ' + server.serverName +' name ' + name);
    }
 }
 
@@ -73,10 +98,9 @@ function addNewServer(server)
 
 function removeServerFromList(server)
 {
-	var index;
-	index = connections.indexOf(server);
-	connections.splice(index, 1);
-	converter.convert(connections);
+   var index;
+   index = connections.indexOf(server);
+   connections.splice(index, 1);
 }
 
 function sendDataToServerWithName(name)

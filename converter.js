@@ -12,7 +12,8 @@ function convert(array){
 		  		serverName : tmp.serverName,
 		  		status: tmp.status,
 		  		money: tmp.money,
-		  		rank: tmp.rank
+		  		rank: tmp.rank,
+		  		fbImageUrl: tmp.fbImageUrl
 		  	};		
   		  	arrayForJson[i] = objToWrite;
   		} else {

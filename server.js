@@ -48,7 +48,9 @@ net.createServer(function(sock) {
         server.socket = sock;
         server.money = data.readInt8(4,4);
         server.rank = data.readInt8(8,4);
-        server.serverName = data.toString('utf8', 12, data.length);
+        var nameLen = data.readInt8(12,4);
+        server.serverName = data.toString('utf8', 16, 16+nameLen);
+        server.fbImageUrl = data.toString('utf8', 16+nameLen, data.length);
         server.status = "A";
         addNewServer(server);
         console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);

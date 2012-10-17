@@ -72,12 +72,14 @@ net.createServer(function(sock) {
     sock.on('timeout', function(data) {
         console.log('TIMEOUT: ' + sock.remoteAddress +' '+ sock.remotePort);
         removeServerFromList(serverForSocket(sock));
+        sock.destroy();
     });
 
     // Add a 'close' event handler to this instance of socket
     sock.on('close', function(data) {
         console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
         removeServerFromList(serverForSocket(sock));
+        sock.destroy();
     });
     
 }).listen(PORT);
@@ -108,15 +110,17 @@ function addNewServer(server)
    {
        connections[connections.length] = server;
    }
-   else sock.destroy();   
+   else server.socket.end();   
 }
 
 function removeServerFromList(server)
 {
-  if (server.pairSocket) {
-    var buffer = new Buffer();
-    buffer[0] = 4;
-    server.pairSocket.write(buffer);
+  if (server) {
+    if (server.pairSocket){
+      var buffer = new Buffer(1);
+      buffer[0] = 4;
+      server.pairSocket.write(buffer);
+    }
   }
    var index;
    index = connections.indexOf(server);

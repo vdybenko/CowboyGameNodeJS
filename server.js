@@ -40,7 +40,7 @@ net.createServer(function(sock) {
     
 
     sock.on('data', function(data){
-      processDataFromSocket(data,sock)
+      processDataFromSocket(data,sock);
     });
 
     sock.on('drain', function(){
@@ -127,7 +127,8 @@ function processDataFromSocket(data, sock)
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ 
       // sending list of servers:
       var tempServer = serverForSocket(sock);
-      var listOfServers = converter.convert(connections, tempServer.serverName);
+      console.log('curr '+tempServer.serverName);
+      var listOfServers = converter.convert(connections, tempServer);
       // form data to send:
       var dataOfListBuffer = new Buffer(listOfServers.length + 1);
       dataOfListBuffer[0] = 2;

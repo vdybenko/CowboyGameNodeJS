@@ -1,8 +1,3 @@
-//require section:
-var fs = require('fs');
-//constant values section:
-var path = "currentServersList";
-
 function convert(array, currentServerName){
 	var arrayForJson = new Array();
 	for (var i = 0; i < array.length; i++) {

@@ -39,10 +39,10 @@ net.createServer(function(sock) {
             // form data to send:
             var dataOfListBuffer = new Buffer(listOfServers.length + 1);
             dataOfListBuffer[0] = 2;
-            dataOfListBuffer.write(listOfServers, 1);
+            dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
 
             tempServer.socket.write(dataOfListBuffer);
-			console.log('list online' + dataOfListBuffer);
+			console.log('list online' + dataOfListBuffer.toString('utf8', 0, dataOfListBuffer.length));
 		  } else if (data.readInt8(0) == 3) {    //set pair server packet
 			 console.log('set pair socket ' + data.toString('utf8', 4));
 			 var name = data.toString('utf8', 4);

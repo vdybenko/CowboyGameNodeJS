@@ -2,11 +2,8 @@ var net = require('net');
 var converter = require('./converter');
 
 var connections = new Array();
-
-//var HOST = '192.168.0.16';
 var PORT = 8888;
 
-// var DaysEnum = Object.freeze ({ monday: {}, tuesday: {}, ... });
 var packetCodes = Object.freeze({
   NETWORK_PING: 0,
   NETWORK_POST_INFO:1,
@@ -43,10 +40,9 @@ net.createServer(function(sock) {
     
 
     sock.on('data', function(data) {
-      // if (data.readInt8(0) == 0){       //ping packet
       if (data.readInt8(0) == packetCodes.NETWORK_PING){
 			 console.log('get ping packet'); 
-		  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ //1) {   //info packet
+		  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ 
         console.log('data info ' + data);
         var server = {}
         server.socket = sock;
@@ -56,7 +52,7 @@ net.createServer(function(sock) {
         server.status = "A";
         addNewServer(server);
         console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
-      } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ // 2) {   //list online packet
+      } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ 
             // sending list of servers:
             var tempServer = serverForSocket(sock);
             var listOfServers = converter.convert(connections);
@@ -68,7 +64,7 @@ net.createServer(function(sock) {
 
             tempServer.socket.write(dataOfListBuffer);
 			console.log('list online' + dataOfListBuffer.toString('utf8', 0, dataOfListBuffer.length));
-		  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ //3) {    //set pair server packet
+		  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ 
 			 console.log('set pair socket ' + data.toString('utf8', 4));
 			 var name = data.toString('utf8', 4);
 			 var tempServer = serverForSocket(sock);

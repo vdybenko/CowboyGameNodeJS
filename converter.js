@@ -3,12 +3,12 @@ var fs = require('fs');
 //constant values section:
 var path = "currentServersList";
 
-function convert(array, except){
+function convert(array, currentServerName){
 	var arrayForJson = new Array();
 	for (var i = 0; i < array.length; i++) {
 		var tmp = array[i];
 		if (tmp){
-			if (tmp.serverName != except){ 
+			if (tmp.serverName != currentServerName){ 
 				var objToWrite = {
 			  		serverName : tmp.serverName,
 			  		status: tmp.status,

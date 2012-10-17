@@ -18,7 +18,7 @@ function convert(array, currentServer){
   		}
 	}
 	var index;
-	index = arrayForJson.indexOf(currentServer);
+	index = array.indexOf(currentServer);
 	arrayForJson.splice(index, 1);
 	return JSON.stringify(arrayForJson);
 }

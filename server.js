@@ -129,6 +129,7 @@ function processDataFromSocket(data, sock)
       var tempServer = serverForSocket(sock);
       console.log('curr '+tempServer.serverName);
       var listOfServers = converter.convert(connections, tempServer);
+      console.log('list: '+listOfServers);
       // form data to send:
       var dataOfListBuffer = new Buffer(listOfServers.length + 1);
       dataOfListBuffer[0] = 2;

@@ -6,6 +6,30 @@ var connections = new Array();
 //var HOST = '192.168.0.16';
 var PORT = 8888;
 
+// var DaysEnum = Object.freeze ({ monday: {}, tuesday: {}, ... });
+var packetCodes = Object.freeze({
+  NETWORK_PING: 0,
+  NETWORK_POST_INFO:1,
+  NETWORK_GET_LIST_ONLINE:2,
+  NETWORK_SET_PAIR:3,
+  NETWORK_LOST_CONNECTION:4,
+  NETWORK_TIME:5,         
+  NETWORK_TIME_TRY:6,               
+  NETWORK_START_DUEL:7,       
+  NETWORK_START_DUEL_TRUE:8,        
+  NETWORK_START_DUEL_FALSE:9,       
+  NETWORK_ACCEL_STATE:10,                    
+  NETWORK_ACCEL_STATE_TRUE:11,               
+  NETWORK_SEND_SHOT_TIME:12,                 
+  NETWORK_FOLL_START:13,                     
+  NETWORK_FOLL_END:14,                       
+  NETWORK_OPONTYPE_RESPONSE:15,              
+  NETWORK_OPONTYPE_RESPONSE_TRY:16,          
+  NETWORK_RUN_AWAY:17,                       
+  NETWORK_RESPONSE:18,                       
+  NETWORK_DUEL_CANSEL:19                     
+ });
+
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
 // The sock object the callback function receives UNIQUE for each connection
@@ -19,9 +43,10 @@ net.createServer(function(sock) {
     
 
     sock.on('data', function(data) {
-      if (data.readInt8(0) == 0){       //ping packet
+      // if (data.readInt8(0) == 0){       //ping packet
+      if (data.readInt8(0) == packetCodes.NETWORK_PING){
 			 console.log('get ping packet'); 
-		  } else if (data.readInt8(0) == 1) {   //info packet
+		  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ //1) {   //info packet
         console.log('data info ' + data);
         var server = {}
         server.socket = sock;
@@ -31,7 +56,7 @@ net.createServer(function(sock) {
         server.status = "A";
         addNewServer(server);
         console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
-      } else if (data.readInt8(0) == 2) {   //list online packet
+      } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ // 2) {   //list online packet
             // sending list of servers:
             var tempServer = serverForSocket(sock);
             var listOfServers = converter.convert(connections);
@@ -43,7 +68,7 @@ net.createServer(function(sock) {
 
             tempServer.socket.write(dataOfListBuffer);
 			console.log('list online' + dataOfListBuffer.toString('utf8', 0, dataOfListBuffer.length));
-		  } else if (data.readInt8(0) == 3) {    //set pair server packet
+		  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ //3) {    //set pair server packet
 			 console.log('set pair socket ' + data.toString('utf8', 4));
 			 var name = data.toString('utf8', 4);
 			 var tempServer = serverForSocket(sock);

@@ -3,8 +3,8 @@ var converter = require('./converter');
 
 var connections = new Array();
 
-var HOST = '192.168.0.16';
-var PORT = 6969;
+//var HOST = '192.168.0.16';
+var PORT = 8888;
 
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
@@ -37,12 +37,12 @@ net.createServer(function(sock) {
             var listOfServers = converter.convert(connections);
 
             // form data to send:
-            dataOfListBuffer = new Buffer(listOfServers.length+1);
+            var dataOfListBuffer = new Buffer(listOfServers.length + 1);
             dataOfListBuffer[0] = 2;
             dataOfListBuffer.write(listOfServers, 1);
 
             tempServer.socket.write(dataOfListBuffer);
-			console.log('list online' + converter.convert(connections));
+			console.log('list online' + dataOfListBuffer);
 		  } else if (data.readInt8(0) == 3) {    //set pair server packet
 			 console.log('set pair socket ' + data.toString('utf8', 4));
 			 var name = data.toString('utf8', 4);
@@ -80,7 +80,7 @@ net.createServer(function(sock) {
         removeServerFromList(serverForSocket(sock));
     });
     
-}).listen(PORT, HOST);
+}).listen(PORT);
 
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
@@ -116,7 +116,7 @@ function removeServerFromList(server)
   if (server.pairSocket) {
     var buffer = new Buffer();
     buffer[0] = 4;
-    server.pairSocket;
+    server.pairSocket.write(buffer);
   }
    var index;
    index = connections.indexOf(server);
@@ -130,4 +130,4 @@ function sendDataToServerWithName(name)
    server.socket.write('server to client');
 }
 
-console.log('Server listening on ' + HOST +':'+ PORT);
+console.log('Server listening on ' +':'+ PORT);

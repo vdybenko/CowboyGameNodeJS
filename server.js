@@ -41,8 +41,8 @@ net.createServer(function(sock) {
 
     sock.on('data', function(data) {
       if (data.readInt8(0) == packetCodes.NETWORK_PING){
-			 console.log('get ping packet'); 
-		  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ 
+       console.log('get ping packet'); 
+      } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ 
         console.log('data info ' + data);
         var server = {}
         server.socket = sock;
@@ -57,40 +57,41 @@ net.createServer(function(sock) {
       } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ 
             // sending list of servers:
             var tempServer = serverForSocket(sock);
-            var listOfServers = converter.convert(connections);
+            var listOfServers = converter.convert(connections, tempServer.serverName);
 
+            console.log('except: '+tempServer.serverName);
             // form data to send:
             var dataOfListBuffer = new Buffer(listOfServers.length + 1);
             dataOfListBuffer[0] = 2;
             dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
 
             tempServer.socket.write(dataOfListBuffer);
-			console.log('list online' + dataOfListBuffer.toString('utf8', 0, dataOfListBuffer.length));
-		  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ 
-			 console.log('set pair socket ' + data.toString('utf8', 4));
-			 var name = data.toString('utf8', 4);
-			 var tempServer = serverForSocket(sock);
-			 var pairServer = serverForName(name);
-			 if (pairServer) {
-				pairServer.pairSocket = sock;
+      // console.log('list online' + dataOfListBuffer.toString('utf8', 0, dataOfListBuffer.length));
+      } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ 
+       console.log('set pair socket ' + data.toString('utf8', 4));
+       var name = data.toString('utf8', 4);
+       var tempServer = serverForSocket(sock);
+       var pairServer = serverForName(name);
+       if (pairServer) {
+        pairServer.pairSocket = sock;
                 pairServer.status = 'B';
-				tempServer.pairSocket = pairServer.socket;
+        tempServer.pairSocket = pairServer.socket;
                 tempServer.status = 'B';
-			 }
-			 else console.log('cannot find pair server for name ' + name);
-			
-		  } else if (data.readInt8(0) > 4){   //worked packet
-			 console.log('send data to client ' + data);
-			 tempServer = serverForSocket(sock);
-			 if (tempServer.pairSocket) tempServer.pairSocket.write(data);
-			 else console.log('pair socket does not set');
-		  }
-	
+       }
+       else console.log('cannot find pair server for name ' + name);
+      
+      } else if (data.readInt8(0) > 4){   //worked packet
+       console.log('send data to client ' + data);
+       tempServer = serverForSocket(sock);
+       if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+       else console.log('pair socket does not set');
+      }
+  
     });
     
-	sock.on('drain', function(){
-		console.log('drain!');	
-	});
+  sock.on('drain', function(){
+    console.log('drain!');  
+  });
     // Add a 'timeout' event handler to this instance of socket
     sock.on('timeout', function(data) {
         console.log('TIMEOUT: ' + sock.remoteAddress +' '+ sock.remotePort);
@@ -114,10 +115,10 @@ function serverForName(name){
 }
 
 function serverForSocket(sock) {
-	for (i = 0; i < connections.length; i++){
-	      var server = connections[i];
-	      if (server.socket == sock) return server;
-	}
+  for (i = 0; i < connections.length; i++){
+        var server = connections[i];
+        if (server.socket == sock) return server;
+  }
 }
 
 function addNewServer(server)

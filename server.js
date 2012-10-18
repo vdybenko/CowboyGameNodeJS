@@ -24,7 +24,9 @@ var packetCodes = Object.freeze({
   NETWORK_OPONTYPE_RESPONSE_TRY:16,          
   NETWORK_RUN_AWAY:17,                       
   NETWORK_RESPONSE:18,                       
-  NETWORK_DUEL_CANSEL:19                     
+  NETWORK_DUEL_CANSEL:19,
+  NETWORK_DISCONNECT_PAIR:20,
+  NETWORK_DISCONNECTED_PAIR:21                     
  });
 
 // Create a server instance, and chain the listen function to it
@@ -44,7 +46,7 @@ net.createServer(function(sock) {
     });
 
     sock.on('drain', function(){
-      console.log('drain!');  
+        console.log('drain!');  
     });
     // Add a 'timeout' event handler to this instance of socket
     sock.on('timeout', function(data) {
@@ -58,13 +60,20 @@ net.createServer(function(sock) {
         removeServerFromList(serverForSocket(sock));
     });
     
+    // // Событие: 'end' function () { } Генерируется когда другой участник соединения посылает пакет FIN.
+    // sock.on('end', function(){
+    //   console.log('Opponent disconnected');
+    //   var tempServer = serverForSocket(sock);
+    //   tempServer.status = 'A';
+    //   destroyPairSocket(tempServer);
+    // });
 }).listen(PORT);
 
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
       var server = connections[i];
       if (server.serverName === name) return server;
-      console.log('serverForName: ' + server.serverName +' name ' + name);
+      // console.log('serverForName: ' + server.serverName +' name ' + name);
    }
 }
 
@@ -72,6 +81,7 @@ function serverForSocket(sock) {
   for (i = 0; i < connections.length; i++){
         var server = connections[i];
         if (server.socket == sock) return server;
+
   }
 }
 
@@ -104,15 +114,15 @@ function removeServerFromList(server)
 function sendDataToServerWithName(name)
 {
    var server = serverForName(name);
-   console.log('server to client' + name);
+   // console.log('server to client' + name);
    server.socket.write('server to client');
 }
 
 function processDataFromSocket(data, sock)
 { 
   if (data.readInt8(0) == packetCodes.NETWORK_PING){
-   console.log('get ping packet'); 
-  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){ 
+   // console.log('get ping packet'); 
+  } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
       console.log('data info ' + data);
       var server = {}
       server.socket = sock;
@@ -124,18 +134,18 @@ function processDataFromSocket(data, sock)
       server.status = "A";
       addNewServer(server);
       console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
-  } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){ 
+  } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
       // sending list of servers:
       var tempServer = serverForSocket(sock);
       console.log('curr '+tempServer.serverName);
       var listOfServers = converter.convert(connections, tempServer);
-      console.log('list: '+listOfServers);
+      // console.log('list: '+listOfServers);
       // form data to send:
       var dataOfListBuffer = new Buffer(listOfServers.length + 1);
       dataOfListBuffer[0] = 2;
       dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
       tempServer.socket.write(dataOfListBuffer);
-  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){ 
+  } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){   //set pair of clients
       console.log('set pair socket ' + data.toString('utf8', 4));
       var name = data.toString('utf8', 4);
       var tempServer = serverForSocket(sock);
@@ -145,15 +155,51 @@ function processDataFromSocket(data, sock)
         pairServer.status = 'B';
         tempServer.pairSocket = pairServer.socket;
         tempServer.status = 'B';
+        console.log('Pair '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
       }
       else console.log('cannot find pair server for name ' + name);
   
   } else if (data.readInt8(0) > 4){   //worked packet
-   console.log('send data to client ' + data);
-   tempServer = serverForSocket(sock);
-   if (tempServer.pairSocket) tempServer.pairSocket.write(data);
-   else console.log('pair socket does not set');
+      tempServer = serverForSocket(sock);
+      if (data.readInt8(0) == packetCodes.NETWORK_DISCONNECT_PAIR){ //unset pair of clients
+        console.log('NETWORK_DISCONNECT_PAIR getted');
+        if (tempServer.pairSocket) {      
+          // sending that we were disconnected to other side:
+          var discPacket = new Buffer(4);
+          discPacket[0] = packetCodes.NETWORK_DISCONNECTED_PAIR;
+          tempServer.pairSocket.write(discPacket);
+
+          console.log('discPacket[0]: '+ discPacket[0]);
+
+          destroyPairSocket(tempServer);
+        }
+        else console.log('pair socket does not set');
+      }
+      else if (data.readInt8(0) == packetCodes.NETWORK_DISCONNECTED_PAIR){ 
+        // we get response that the other side disconnected:
+        console.log('NETWORK_DISCONNECTED_PAIR getted');
+        if (tempServer.pairSocket) destroyPairSocket(tempServer); 
+      }
+      else
+      {
+           console.log('send data to client ' + data);
+           
+           if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+           else console.log('pair socket does not set');
+      }
   }
   
 }
-console.log('Server listening on ' +':'+ PORT);
+
+function destroyPairSocket(server){
+  server.status = 'A';
+  var tmp = serverForSocket(server.pairSocket);
+  if (server.pairSocket) {
+
+    // server.pairSocket.end();
+    server.pairSocket = null;
+    console.log('pair '+ server.serverName + ' && ' + tmp.serverName+ ' destroyed');
+  };
+}
+
+console.log('Server listening on ' +':'+ PORT); 

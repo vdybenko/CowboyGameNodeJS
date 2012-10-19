@@ -91,11 +91,15 @@ function addNewServer(server)
 
 function removeServerFromList(server)
 {
-  if (server.pairSocket) {
-    var buffer = new Buffer();
-    buffer[0] = 4;
-    server.pairSocket.write(buffer);
-  }
+  if (server) {
+    if (server.pairSocket && server.pairSocket.wrirable) {
+      var buffer = new Buffer(1);
+      buffer[0] = 4;
+      console.log('removeServerFromList try send data');
+      server.pairSocket.write(buffer);
+      
+    }
+  };
    var index;
    index = connections.indexOf(server);
    connections.splice(index, 1);

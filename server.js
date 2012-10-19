@@ -64,8 +64,8 @@ net.createServer(function(sock) {
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
       var server = connections[i];
-      if (server.serverName === name) return server;
-      // console.log('serverForName: ' + server.serverName +' name ' + name);
+      if (server.displayName === name) return server;
+      // console.log('serverForName: ' + server.displayName +' name ' + name);
    }
 }
 
@@ -82,7 +82,7 @@ function addNewServer(server)
    var serverAlreadyAdded = false;
    for (i = 0; i < connections.length; i++){
       var serverTemp = connections[i];
-      if (server.serverName === serverTemp.serverName) serverAlreadyAdded = true;
+      if (server.displayName === serverTemp.displayName) serverAlreadyAdded = true;
    }
    if (!serverAlreadyAdded) 
    {
@@ -121,18 +121,24 @@ function processDataFromSocket(data, sock)
       server.socket = sock;
       server.money = data.readInt8(4,4);
       server.rank = data.readInt8(8,4);
-      var nameLen = data.readInt8(12,4);
-      server.serverName = data.toString('utf8', 16, 16+nameLen);
-      server.fbImageUrl = data.toString('utf8', 16+nameLen, data.length);
+      
+      var displayNameLen = data.readInt8(12,4);
+      server.displayName = data.toString('utf8', 16, 16+displayNameLen);
+
+      var nameLen = data.readInt8(16+displayNameLen,4);
+      server.serverName = data.toString('utf8', 20+displayNameLen, 20+displayNameLen+nameLen);
+      
+      server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
       server.status = "A";
       addNewServer(server);
       console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
+      // console.log
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
       // sending list of servers:
       var tempServer = serverForSocket(sock);
-      console.log('curr '+tempServer.serverName);
+      console.log('curr '+tempServer.displayName);
       var listOfServers = converter.convert(connections, tempServer);
-      // console.log('list: '+listOfServers);
+      console.log('list: '+listOfServers);
       // form data to send:
       var dataOfListBuffer = new Buffer(listOfServers.length + 1);
       dataOfListBuffer[0] = 2;
@@ -148,7 +154,7 @@ function processDataFromSocket(data, sock)
         pairServer.status = 'B';
         tempServer.pairSocket = pairServer.socket;
         tempServer.status = 'B';
-        console.log('Pair '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
+        console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
       }
       else console.log('cannot find pair server for name ' + name);
   
@@ -182,7 +188,7 @@ function destroyPairSocket(server){
   var tmp = serverForSocket(server.pairSocket);
   if (server.pairSocket) {
     server.pairSocket = null;
-    console.log('pair '+ server.serverName + ' && ' + tmp.serverName+ ' destroyed');
+    console.log('pair '+ server.displayName + ' && ' + tmp.displayName+ ' destroyed');
   };
 }
 

@@ -64,8 +64,8 @@ net.createServer(function(sock) {
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
       var server = connections[i];
-      if (server.displayName === name) return server;
-      // console.log('serverForName: ' + server.displayName +' name ' + name);
+      if (server.serverName === name) return server;
+      console.log('serverForName: ' + server.displayName +' name ' + name);
    }
 }
 
@@ -82,7 +82,7 @@ function addNewServer(server)
    var serverAlreadyAdded = false;
    for (i = 0; i < connections.length; i++){
       var serverTemp = connections[i];
-      if (server.displayName === serverTemp.displayName) serverAlreadyAdded = true;
+      if (server.serverName === serverTemp.serverName) serverAlreadyAdded = true;
    }
    if (!serverAlreadyAdded) 
    {
@@ -132,7 +132,8 @@ function processDataFromSocket(data, sock)
       server.status = "A";
       addNewServer(server);
       console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
-      // console.log
+      console.log('name: '+server.name+' displayName: '+server.displayName);
+      console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
       // sending list of servers:
       var tempServer = serverForSocket(sock);
@@ -155,6 +156,7 @@ function processDataFromSocket(data, sock)
         tempServer.pairSocket = pairServer.socket;
         tempServer.status = 'B';
         console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
+        console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
       }
       else console.log('cannot find pair server for name ' + name);
   

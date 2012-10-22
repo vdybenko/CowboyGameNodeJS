@@ -116,7 +116,8 @@ function sendDataToServerWithName(name)
 
 function processDataFromSocket(data, sock)
 { 
-  console.log('get '+data.readInt8(0));
+  if (data.readInt8(0) != packetCodes.NETWORK_PING)
+    console.log('get '+data.readInt8(0));
   if (data.readInt8(0) == packetCodes.NETWORK_PING){
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
@@ -165,6 +166,7 @@ function processDataFromSocket(data, sock)
         tempServer.status = 'B';
         console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
         console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
+        console.log('They are: '+ tempServer.status+ ' && '+pairServer.status + ' now ');
       }
       else console.log('cannot find pair server for name ' + name);
   
@@ -197,8 +199,10 @@ function destroyPairSocket(server){
   server.status = 'A';
   var tmp = serverForSocket(server.pairSocket);
   if (server.pairSocket) {
-    server.pairSocket = null;
     console.log('pair '+ server.displayName + ' && ' + tmp.displayName+ ' destroyed');
+    console.log('They are: '+ server.status+ ' && '+tmp.status + ' now ');
+    server.pairSocket = null;
+    // console.log('pair '+ server.displayName + ' && ' + tmp.displayName+ ' destroyed');
   };
 }
 

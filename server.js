@@ -116,7 +116,8 @@ function sendDataToServerWithName(name)
 
 function processDataFromSocket(data, sock)
 { 
-  console.log('get '+data.readInt8(0));
+  if (data.readInt8(0) != packetCodes.NETWORK_PING)
+    console.log('get '+data.readInt8(0));
   if (data.readInt8(0) == packetCodes.NETWORK_PING){
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
@@ -140,6 +141,7 @@ function processDataFromSocket(data, sock)
       console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
       // sending list of servers:
+      try{
       var tempServer = serverForSocket(sock);
       console.log('curr '+tempServer.displayName);
       var listOfServers = converter.convert(connections, tempServer);
@@ -149,6 +151,9 @@ function processDataFromSocket(data, sock)
       dataOfListBuffer[0] = 2;
       dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
       tempServer.socket.write(dataOfListBuffer);
+    }catch(err){
+      console.log(err.message);
+    }
   } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){   //set pair of clients
       console.log('set pair socket ' + data.toString('utf8', 4));
       var name = data.toString('utf8', 4);

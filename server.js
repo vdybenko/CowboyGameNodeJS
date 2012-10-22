@@ -116,8 +116,7 @@ function sendDataToServerWithName(name)
 
 function processDataFromSocket(data, sock)
 { 
-  if (data.readInt8(0) != packetCodes.NETWORK_PING)
-    console.log('get '+data.readInt8(0));
+  console.log('get '+data.readInt8(0));
   if (data.readInt8(0) == packetCodes.NETWORK_PING){
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info

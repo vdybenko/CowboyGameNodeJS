@@ -73,7 +73,7 @@ function serverForSocket(sock) {
   for (i = 0; i < connections.length; i++){
         var server = connections[i];
         if (server.socket == sock) return server;
-
+      console.log('serverForSocket: ' + server.displayName +' socket ' + sock.remoteAddress);
   }
 }
 
@@ -137,7 +137,7 @@ function processDataFromSocket(data, sock)
       server.status = "A";
       addNewServer(server);
       console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
-      console.log('name: '+server.name+' displayName: '+server.displayName);
+      console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
       // sending list of servers:
@@ -152,7 +152,7 @@ function processDataFromSocket(data, sock)
       dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
       tempServer.socket.write(dataOfListBuffer);
     }catch(err){
-      console.log(err.message);
+      console.log('There is err occured: ' + err.message);
     }
   } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){   //set pair of clients
       console.log('set pair socket ' + data.toString('utf8', 4));

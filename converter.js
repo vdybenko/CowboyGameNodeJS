@@ -5,8 +5,8 @@ function convert(array, currentServer){
 		var tmp = array[i];
 		if (tmp){
 			var objToWrite = {
-		  		serverName : tmp.serverName,
 		  		displayName : tmp.displayName,
+		  		serverName : tmp.serverName,
 		  		status: tmp.status,
 		  		money: tmp.money,
 		  		rank: tmp.rank,

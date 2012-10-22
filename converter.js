@@ -5,12 +5,12 @@ function convert(array, currentServer){
 		var tmp = array[i];
 		if (tmp){
 			var objToWrite = {
-		  		displayName : tmp.displayName,
-		  		serverName : tmp.serverName,
-		  		status: tmp.status,
-		  		money: tmp.money,
-		  		rank: tmp.rank,
-		  		fbImageUrl: tmp.fbImageUrl
+				money : tmp.money,
+				rank : tmp.rank,
+				displayName : tmp.displayName,
+				serverName : tmp.serverName,
+				fbImageUrl : tmp.fbImageUrl,
+				status : tmp.status
 		  	};		
   		  	arrayForJson[i] = objToWrite;
   		  	

@@ -173,6 +173,7 @@ function processDataFromSocket(data, sock)
   } else if (data.readInt8(0) == packetCodes.NETWORK_DISCONNECT_PAIR){
       tempServer = serverForSocket(sock);
       console.log('NETWORK_DISCONNECT_PAIR getted');
+      if (tempServer)
       if (tempServer.pairSocket){
         // sending that we were disconnected to other side:
         var discPacket = new Buffer(4);
@@ -188,9 +189,9 @@ function processDataFromSocket(data, sock)
   } else if (data.readInt8(0) > 4){   //worked packet
       tempServer = serverForSocket(sock);
       console.log('send data to client ' + data);
-       
-      if (tempServer.pairSocket) tempServer.pairSocket.write(data);
-       else console.log('pair socket does not set');    
+      if (tempServer)
+            if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+                   else console.log('pair socket does not set');    
   }
   
 }

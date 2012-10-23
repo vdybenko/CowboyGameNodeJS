@@ -9,23 +9,25 @@ var packetCodes = Object.freeze({
   NETWORK_POST_INFO:1,
   NETWORK_GET_LIST_ONLINE:2,
   NETWORK_SET_PAIR:3,
-  NETWORK_DISCONNECT_PAIR:4,
-  NETWORK_LOST_CONNECTION:5,
-  NETWORK_TIME:6,         
-  NETWORK_TIME_TRY:7,               
-  NETWORK_START_DUEL:8,       
-  NETWORK_START_DUEL_TRUE:9,        
-  NETWORK_START_DUEL_FALSE:10,       
-  NETWORK_ACCEL_STATE:11,                    
-  NETWORK_ACCEL_STATE_TRUE:12,               
-  NETWORK_SEND_SHOT_TIME:13,                 
-  NETWORK_FOLL_START:14,                     
-  NETWORK_FOLL_END:15,                       
-  NETWORK_OPONTYPE_RESPONSE:16,              
-  NETWORK_OPONTYPE_RESPONSE_TRY:17,          
-  NETWORK_RUN_AWAY:18,                       
-  NETWORK_RESPONSE:19,                       
-  NETWORK_DUEL_CANSEL:20
+  NETWORK_PAIR_SET_TRUE:4,
+  NETWORK_PAIR_SET_FALSE:5,
+  NETWORK_DISCONNECT_PAIR:6,
+  NETWORK_LOST_CONNECTION:7,
+  NETWORK_TIME:8,         
+  NETWORK_TIME_TRY:9,               
+  NETWORK_START_DUEL:10,       
+  NETWORK_START_DUEL_TRUE:11,        
+  NETWORK_START_DUEL_FALSE:12,       
+  NETWORK_ACCEL_STATE:13,                    
+  NETWORK_ACCEL_STATE_TRUE:14,               
+  NETWORK_SEND_SHOT_TIME:15,                 
+  NETWORK_FOLL_START:16,                     
+  NETWORK_FOLL_END:17,                       
+  NETWORK_OPONTYPE_RESPONSE:18,              
+  NETWORK_OPONTYPE_RESPONSE_TRY:19,          
+  NETWORK_RUN_AWAY:20,                       
+  NETWORK_RESPONSE:21,                       
+  NETWORK_DUEL_CANSEL:22
  });
 
 // Create a server instance, and chain the listen function to it
@@ -159,7 +161,12 @@ function processDataFromSocket(data, sock)
       var name = data.toString('utf8', 4);
       var tempServer = serverForSocket(sock);
       var pairServer = serverForName(name);
+      
       if (pairServer) {
+        var discPacket = new Buffer(4);
+        discPacket[0] = packetCodes.NETWORK_PAIR_SET_TRUE;
+        tempServer.socket.write(discPacket);
+        
         pairServer.pairSocket = sock;
         pairServer.status = 'B';
         tempServer.pairSocket = pairServer.socket;

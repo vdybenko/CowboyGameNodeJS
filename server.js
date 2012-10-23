@@ -64,16 +64,21 @@ net.createServer(function(sock) {
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
       var server = connections[i];
-      if (server.serverName === name) return server;
-      console.log('serverForName: ' + server.displayName +' name ' + name);
+      if (name.indexOf(server.serverName) != -1){
+        console.log('Found server: ' + server.displayName +' ForName ' + name);
+        return server;
+      }
    }
 }
 
 function serverForSocket(sock) {
   for (i = 0; i < connections.length; i++){
         var server = connections[i];
-        if (server.socket == sock) return server;
-      console.log('serverForSocket: ' + server.displayName +' socket ' + sock.remoteAddress);
+        if (server.socket == sock){
+          console.log('Found server: ' + server.displayName +' ForSocket ' + sock.remoteAddress);
+          return server;
+        }
+        
   }
 }
 
@@ -94,7 +99,7 @@ function addNewServer(server)
 function removeServerFromList(server)
 {
   if (server) {
-    if (server.pairSocket && server.pairSocket.wrirable) {
+    if (server.pairSocket && server.pairSocket.writable) {
       var buffer = new Buffer(1);
       buffer[0] = 4;
       console.log('removeServerFromList try send data');
@@ -130,7 +135,7 @@ function processDataFromSocket(data, sock)
       var displayNameLen = data.readInt8(12,4);
       server.displayName = data.toString('utf8', 16, 16+displayNameLen);
 
-      var nameLen = data.readInt8(16+displayNameLen,4);
+      var nameLen = data.readInt8(16+displayNameLen,4);console.log('name len: ', nameLen);
       server.serverName = data.toString('utf8', 20+displayNameLen, 20+displayNameLen+nameLen);
       
       server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
@@ -155,8 +160,8 @@ function processDataFromSocket(data, sock)
       console.log('There is err occured: ' + err.message);
     }
   } else if (data.readInt8(0) == packetCodes.NETWORK_SET_PAIR){   //set pair of clients
-      console.log('set pair socket ' + data.toString('utf8', 4));
-      var name = data.toString('utf8', 4);
+      console.log('set pair socket ' + data.toString('utf8', 4, data.length));
+      var name = data.toString('utf8', 4, data.length);
       var tempServer = serverForSocket(sock);
       var pairServer = serverForName(name);
       if (pairServer) {

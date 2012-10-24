@@ -149,8 +149,8 @@ function processDataFromSocket(data, sock)
       var listOfServers = converter.convert(connections, tempServer);
       console.log('list: '+listOfServers);
       // form data to send:
-      var dataOfListBuffer = new Buffer(listOfServers.length + 1);
-      dataOfListBuffer[0] = 2;
+      var dataOfListBuffer = new Buffer (Buffer.byteLength(listOfServers, encoding='utf8')+1);
+      dataOfListBuffer[0] = packetCodes.NETWORK_GET_LIST_ONLINE;
       dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
       tempServer.socket.write(dataOfListBuffer);
     }catch(err){

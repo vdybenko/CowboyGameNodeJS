@@ -84,13 +84,18 @@ function addNewServer(server)
    var serverAlreadyAdded = false;
    for (i = 0; i < connections.length; i++){
       var serverTemp = connections[i];
-      if (server.serverName === serverTemp.serverName) serverAlreadyAdded = true;
+      if (server.serverName === serverTemp.serverName) {
+          serverTemp.socket.destroy();
+          connections[i] = server;
+          serverAlreadyAdded = true;
+          console.log('server ' + server.serverName + ' already added');
+      }
    }
    if (!serverAlreadyAdded) 
    {
        connections[connections.length] = server;
+       console.log('add new server ' + server.serverName);
    }
-   else sock.destroy();   
 }
 
 function removeServerFromList(server)

@@ -163,6 +163,13 @@ function processDataFromSocket(data, sock)
       var pairServer = serverForName(name);
       
       if (pairServer) {
+        if (pairServer.status === 'B'){
+            var discPacket = new Buffer(4);
+            discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
+            tempServer.socket.write(discPacket);
+            return;
+        }
+        
         var discPacket = new Buffer(4);
         discPacket[0] = packetCodes.NETWORK_PAIR_SET_TRUE;
         tempServer.socket.write(discPacket);
@@ -175,7 +182,13 @@ function processDataFromSocket(data, sock)
         console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
         console.log('They are: '+ tempServer.status+ ' && '+pairServer.status + ' now ');
       }
-      else console.log('cannot find pair server for name ' + name);
+      else {
+          var discPacket = new Buffer(4);
+          discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
+          tempServer.socket.write(discPacket);
+          console.log('cannot find pair server for name ' + name);
+          return;
+      }
   
   } else if (data.readInt8(0) == packetCodes.NETWORK_DISCONNECT_PAIR){
       tempServer = serverForSocket(sock);

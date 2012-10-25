@@ -101,7 +101,7 @@ function addNewServer(server)
 function removeServerFromList(server)
 {
   if (server) {
-    if (server.pairSocket && server.pairSocket.wrirable) {
+    if (server.pairSocket) {
       var buffer = new Buffer(1);
       buffer[0] = 4;
       console.log('removeServerFromList try send data');

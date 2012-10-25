@@ -131,7 +131,11 @@ function processDataFromSocket(data, sock)
       console.log('data info ' + data);
       var server = {}
       server.socket = sock;
-      server.money = data.readInt8(4,4);
+      
+      var money = data.readInt8(4,4);
+      if (money < 0) money = 0;
+      
+      server.money = money;
       server.rank = data.readInt8(8,4);
       
       var displayNameLen = data.readInt8(12,4);

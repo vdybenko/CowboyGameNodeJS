@@ -75,7 +75,7 @@ function serverForSocket(sock) {
   for (i = 0; i < connections.length; i++){
         var server = connections[i];
         if (server.socket == sock) return server;
-      console.log('serverForSocket: ' + server.displayName +' socket ' + sock.remoteAddress);
+      console.log('serverForSocket: ' + server.socket +' socket ' + sock);
   }
 }
 
@@ -103,7 +103,7 @@ function removeServerFromList(server)
   if (server) {
     if (server.pairSocket) {
       var buffer = new Buffer(1);
-      buffer[0] = 4;
+      buffer[0] = packetCodes.NETWORK_DISCONNECT_PAIR;
       console.log('removeServerFromList try send data');
       server.pairSocket.write(buffer);
       
@@ -151,10 +151,11 @@ function processDataFromSocket(data, sock)
       console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
+      console.log('connections ' + connections);
       // sending list of servers:
       try{
       var tempServer = serverForSocket(sock);
-      console.log('curr '+tempServer.displayName);
+      //console.log('curr '+tempServer.displayName);
       var listOfServers = converter.convert(connections, tempServer);
       console.log('list: '+listOfServers);
       // form data to send:

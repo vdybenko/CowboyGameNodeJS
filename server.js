@@ -129,7 +129,14 @@ function processDataFromSocket(data, sock)
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
       console.log('data info ' + data);
-      var server = {}
+      var serverExist;
+      var server = serverForSocket(sock);
+      
+      if (!server) {
+          server = {}; 
+          serverExist = false;
+      } else serverExist = true;
+      
       server.socket = sock;
       
       var money = data.readInt8(4,4);
@@ -146,7 +153,7 @@ function processDataFromSocket(data, sock)
       
       server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
       server.status = "A";
-      addNewServer(server);
+      if(!serverExist) addNewServer(server);
       console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
       console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);

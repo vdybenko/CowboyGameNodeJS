@@ -139,7 +139,8 @@ function processDataFromSocket(data, sock)
       
       server.socket = sock;
       
-      var money = data.readInt8(4,4);
+      var money = data.readInt32LE(4,4);
+      console.log('money ' + money);
       if (money < 0) money = 0;
       
       server.money = money;

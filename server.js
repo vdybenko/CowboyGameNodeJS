@@ -33,7 +33,7 @@ var packetCodes = Object.freeze({
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
 // The sock object the callback function receives UNIQUE for each connection
-net.createServer(function(sock) {
+var masretServer = net.createServer(function(sock) {
     sock.setTimeout(10000, function(data) {
         console.log('setTIMEOUT: ' + sock.remoteAddress +' '+ sock.remotePort);
     });    
@@ -60,8 +60,14 @@ net.createServer(function(sock) {
         console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
         removeServerFromList(serverForSocket(sock));
     });
+    sock.on('error', function(exception){
+        console.log('Exception:');
+        console.log(exception);
+    }); 
 
 }).listen(PORT);
+
+
 
 function serverForName(name){
    for (i = 0; i < connections.length; i++){
@@ -105,7 +111,11 @@ function removeServerFromList(server)
       var buffer = new Buffer(1);
       buffer[0] = packetCodes.NETWORK_DISCONNECT_PAIR;
       console.log('removeServerFromList try send data');
-      server.pairSocket.write(buffer);
+      try{
+             server.pairSocket.write(buffer);
+         }catch(err){
+             console.log('There is err occured: ' + err.message);
+         }
       
     }
   };
@@ -114,12 +124,6 @@ function removeServerFromList(server)
    connections.splice(index, 1);
 }
 
-function sendDataToServerWithName(name)
-{
-   var server = serverForName(name);
-   console.log('server to client' + name);
-   server.socket.write('server to client');
-}
 
 function processDataFromSocket(data, sock)
 { 
@@ -170,7 +174,11 @@ function processDataFromSocket(data, sock)
       var dataOfListBuffer = new Buffer (Buffer.byteLength(listOfServers, encoding='utf8')+1);
       dataOfListBuffer[0] = packetCodes.NETWORK_GET_LIST_ONLINE;
       dataOfListBuffer.write(listOfServers, 1, dataOfListBuffer.length, 'utf8');
-      tempServer.socket.write(dataOfListBuffer);
+      try{
+             tempServer.socket.write(dataOfListBuffer);
+         }catch(err){
+             console.log('There is err occured: ' + err.message);
+         }
     }catch(err){
       console.log('There is err occured: ' + err.message);
     }
@@ -184,7 +192,11 @@ function processDataFromSocket(data, sock)
         if (pairServer.status === 'B'){
             var discPacket = new Buffer(4);
             discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
-            tempServer.socket.write(discPacket);
+            try{
+              tempServer.socket.write(discPacket);
+            }catch(err){
+               console.log('There is err occured: ' + err.message);
+            }
             return;
         }
         
@@ -203,7 +215,11 @@ function processDataFromSocket(data, sock)
       else {
           var discPacket = new Buffer(4);
           discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
-          tempServer.socket.write(discPacket);
+          try{
+              tempServer.socket.write(discPacket);
+            }catch(err){
+               console.log('There is err occured: ' + err.message);
+            }
           console.log('cannot find pair server for name ' + name);
           return;
       }
@@ -216,7 +232,11 @@ function processDataFromSocket(data, sock)
         // sending that we were disconnected to other side:
         var discPacket = new Buffer(4);
         discPacket[0] = packetCodes.NETWORK_DISCONNECT_PAIR;
-        tempServer.pairSocket.write(discPacket);
+        try{
+              tempServer.pairSocket.write(discPacket);
+            }catch(err){
+               console.log('There is err occured: ' + err.message);
+            }
         console.log('discPacket[0]: '+ discPacket[0]);
 
         var pairServer = serverForSocket(tempServer.pairSocket);
@@ -228,7 +248,13 @@ function processDataFromSocket(data, sock)
       tempServer = serverForSocket(sock);
       console.log('send data to client ' + data);
       if (tempServer)
-            if (tempServer.pairSocket) tempServer.pairSocket.write(data);
+            if (tempServer.pairSocket) {
+                try{
+                    tempServer.pairSocket.write(data);
+                }catch(err){
+                    console.log('There is err occured: ' + err.message);
+                }
+            }
                    else console.log('pair socket does not set');    
   }
   

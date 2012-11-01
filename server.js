@@ -121,7 +121,13 @@ function removeServerFromList(server)
   };
    var index;
    index = connections.indexOf(server);
-   connections.splice(index, 1);
+   console.log('Remove server at index ' + index);
+   console.log('List of servers before delete ' + converter.convert(connections, server));
+   
+   if (index > -1)  connections.splice(index, 1);
+   
+   console.log('List of servers after delete ' + converter.convert(connections, server));
+   
 }
 
 

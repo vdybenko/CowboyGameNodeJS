@@ -198,6 +198,7 @@ function processDataFromSocket(data, sock)
         if (pairServer.status === 'B'){
             var discPacket = new Buffer(4);
             discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
+            tempServer.status = 'A';
             try{
               tempServer.socket.write(discPacket);
             }catch(err){
@@ -221,6 +222,7 @@ function processDataFromSocket(data, sock)
       else {
           var discPacket = new Buffer(4);
           discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
+          tempServer.status = 'A';
           try{
               tempServer.socket.write(discPacket);
             }catch(err){

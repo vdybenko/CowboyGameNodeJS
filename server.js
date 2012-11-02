@@ -12,22 +12,24 @@ var packetCodes = Object.freeze({
   NETWORK_PAIR_SET_TRUE:4,
   NETWORK_PAIR_SET_FALSE:5,
   NETWORK_DISCONNECT_PAIR:6,
-  NETWORK_LOST_CONNECTION:7,
-  NETWORK_TIME:8,         
-  NETWORK_TIME_TRY:9,               
-  NETWORK_START_DUEL:10,       
-  NETWORK_START_DUEL_TRUE:11,        
-  NETWORK_START_DUEL_FALSE:12,       
-  NETWORK_ACCEL_STATE:13,                    
-  NETWORK_ACCEL_STATE_TRUE:14,               
-  NETWORK_SEND_SHOT_TIME:15,                 
-  NETWORK_FOLL_START:16,                     
-  NETWORK_FOLL_END:17,                       
-  NETWORK_OPONTYPE_RESPONSE:18,              
-  NETWORK_OPONTYPE_RESPONSE_TRY:19,          
-  NETWORK_RUN_AWAY:20,                       
-  NETWORK_RESPONSE:21,                       
-  NETWORK_DUEL_CANSEL:22
+  NETWORK_SET_AVIBLE:7,
+  NETWORK_SET_UNAVIBLE:8,
+  NETWORK_LOST_CONNECTION:9,
+  NETWORK_TIME:10,         
+  NETWORK_TIME_TRY:11,               
+  NETWORK_START_DUEL:12,       
+  NETWORK_START_DUEL_TRUE:13,        
+  NETWORK_START_DUEL_FALSE:14,       
+  NETWORK_ACCEL_STATE:15,                    
+  NETWORK_ACCEL_STATE_TRUE:16,               
+  NETWORK_SEND_SHOT_TIME:17,                 
+  NETWORK_FOLL_START:18,                     
+  NETWORK_FOLL_END:19,                       
+  NETWORK_OPONTYPE_RESPONSE:20,              
+  NETWORK_OPONTYPE_RESPONSE_TRY:21,          
+  NETWORK_RUN_AWAY:22,                       
+  NETWORK_RESPONSE:23,                       
+  NETWORK_DUEL_CANSEL:24
  });
 
 // Create a server instance, and chain the listen function to it
@@ -252,7 +254,7 @@ function processDataFromSocket(data, sock)
         destroyPairSocket(tempServer);
       }
       else console.log('pair socket does not set');      
-  } else if (data.readInt8(0) > 4){   //worked packet
+  } else if (data.readInt8(0) > packetCodes.NETWORK_SET_UNAVIBLE){   //worked packet
       tempServer = serverForSocket(sock);
       console.log('send data to client ' + data);
       if (tempServer)
@@ -264,7 +266,13 @@ function processDataFromSocket(data, sock)
                 }
             }
                    else console.log('pair socket does not set');    
-  }
+  }else if (data.readInt8(0) == packetCodes.NETWORK_SET_UNAVIBLE){
+        tempServer = serverForSocket(sock);
+        tempServer.status = 'B';
+  }else if (data.readInt8(0) == packetCodes.NETWORK_SET_AVIBLE){
+        tempServer = serverForSocket(sock);
+        if (tempServer.pairSocket == null) tempServer.status = 'A';
+      }
   
 }
 

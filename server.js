@@ -250,8 +250,18 @@ function processDataFromSocket(data, sock)
         console.log('discPacket[0]: '+ discPacket[0]);
 
         var pairServer = serverForSocket(tempServer.pairSocket);
-        destroyPairSocket(pairServer);
-        destroyPairSocket(tempServer);
+        try {
+            destroyPairSocket(pairServer);
+        }catch(err){
+               console.log('There is err on NETWORK_DISCONNECT_PAIR getted: ' + err.message);
+           } 
+        try {
+            destroyPairSocket(tempServer);
+        }catch(err){
+               console.log('There is err on NETWORK_DISCONNECT_PAIR getted: ' + err.message);
+           }    
+        
+        
       }
       else console.log('pair socket does not set');      
   } else if (data.readInt8(0) > packetCodes.NETWORK_SET_UNAVIBLE){   //worked packet

@@ -277,11 +277,22 @@ function processDataFromSocket(data, sock)
             }
                    else console.log('pair socket does not set');    
   }else if (data.readInt8(0) == packetCodes.NETWORK_SET_UNAVIBLE){
-        tempServer = serverForSocket(sock);
-        tempServer.status = 'B';
+        try {
+            tempServer = serverForSocket(sock);
+            tempServer.status = 'B';
+        }catch(err){
+               console.log('There is err getted: ' + err.message);
+           } 
+        
   }else if (data.readInt8(0) == packetCodes.NETWORK_SET_AVIBLE){
-        tempServer = serverForSocket(sock);
-        if (tempServer.pairSocket == null) tempServer.status = 'A';
+        
+         try {
+            tempServer = serverForSocket(sock);
+            if (tempServer.pairSocket == null) tempServer.status = 'A';
+        }catch(err){
+               console.log('There is err getted: ' + err.message);
+           } 
+        
       }
   
 }

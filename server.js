@@ -1,5 +1,6 @@
 var net = require('net');
 var converter = require('./converter');
+var botsList = require('./botsList');
 
 var connections = new Array();
 var PORT = 8888;
@@ -43,7 +44,8 @@ var masretServer = net.createServer(function(sock) {
     // We have a connection - a socket object is assigned to the connection automatically
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
     
-
+	botsList.getBotsList();
+	
     sock.on('data', function(data){
       processDataFromSocket(data,sock);
     });

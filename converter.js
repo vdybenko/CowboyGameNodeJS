@@ -1,6 +1,9 @@
+var botsList = require('./botsList');
+
 function convert(array, currentServer){
 	var arrayForJson = new Array();
-
+	array = botsList.addBotsToArray(array);
+	
 	for (var i = 0; i < array.length; i++) {
 		var tmp = array[i];
 		if (tmp){
@@ -10,7 +13,11 @@ function convert(array, currentServer){
 				displayName : tmp.displayName,
 				serverName : tmp.serverName,
 				fbImageUrl : tmp.fbImageUrl,
-				status : tmp.status
+				status : tmp.status,
+				bot : tmp.bot,
+				sessionId : tmp.sessionId,
+				duelsWin : tmp.duelsWin,
+				duelsLost : tmp.duelsLost
 		  	};		
   		  	arrayForJson[i] = objToWrite;
   		  	

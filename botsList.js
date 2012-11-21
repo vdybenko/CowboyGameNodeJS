@@ -23,12 +23,17 @@ function createStaticBots()
 
 function addBotsToArray(array){
 	var arrayOfBots = createStaticBots();
-	
-	for (var i = array.length; i <= 4; i++) {
+	var arrayWithBots = new Array();
+	for (var i = 0; i < array.length; i++) {
 				
-  		  	array[i] = arrayOfBots[i];
+  		  	arrayWithBots[i] = array[i];
   		  	
   		} 
-	return array;
+	for (var i = array.length; i <= 4; i++) {
+				
+  		  	arrayWithBots[i] = arrayOfBots[i];
+  		  	
+  		} 
+	return arrayWithBots;
 }
 exports.addBotsToArray = addBotsToArray;

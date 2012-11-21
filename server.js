@@ -167,7 +167,6 @@ function processDataFromSocket(data, sock)
       server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
       server.status = "A";
       if(!serverExist) addNewServer(server);
-      console.log('CONNECTIONS: ' + connections[0].socket.remoteAddress + ' ' + connections.length);
       console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online

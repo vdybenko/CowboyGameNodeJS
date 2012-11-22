@@ -212,7 +212,12 @@ function processDataFromSocket(data, sock)
         
         var discPacket = new Buffer(4);
         discPacket[0] = packetCodes.NETWORK_PAIR_SET_TRUE;
-        tempServer.socket.write(discPacket);
+        try{
+              tempServer.socket.write(discPacket);
+            }catch(err){
+               console.log('There is err occured: ' + err.message);
+            }
+        
         
         pairServer.pairSocket = sock;
         pairServer.status = 'B';

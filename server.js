@@ -2,6 +2,8 @@ var net = require('net');
 var converter = require('./converter');
 var botsList = require('./botsList');
 
+var gameKey = 'ver2.2';
+
 var connections = new Array();
 var PORT = 8888;
 
@@ -142,7 +144,7 @@ function processDataFromSocket(data, sock)
   if (data.readInt8(0) == packetCodes.NETWORK_PING){
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
-      console.log('data info ' + data);
+      console.log('data info ' + data.toString('utf8', 0, data.length));
       var serverExist;
       var server = serverForSocket(sock);
       
@@ -159,15 +161,23 @@ function processDataFromSocket(data, sock)
       
       server.money = money;
       server.rank = data.readInt8(8,4);
-      
+      server.gameKey = '';
       var displayNameLen = data.readInt8(12,4);
       server.displayName = data.toString('utf8', 16, 16+displayNameLen);
 
       var nameLen = data.readInt8(16+displayNameLen,4);
       server.serverName = data.toString('utf8', 20+displayNameLen, 20+displayNameLen+nameLen);
       
-      server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
+      var clientVersion = data.toString('utf8', data.length - 6, data.length);
+      
+      if (clientVersion === gameKey) {
+      	console.log('version key: ver2.2');
+      	server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length - 6);
+      	server.gameKey = clientVersion;
+      }else server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
+      
       server.status = "A";
+       //server.gameKey = 
       if(!serverExist) addNewServer(server);
       console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);

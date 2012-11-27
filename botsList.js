@@ -39,35 +39,14 @@ function createBots()
 			bot : 1,
 			sessionId : arrayOfBotsJSON[i].session_id,
 			duelsWin : arrayOfBotsJSON[i].duels_win,
-			duelsLost : arrayOfBotsJSON[i].duels_lost  
+			duelsLost : arrayOfBotsJSON[i].duels_lost,
+			weapon :  arrayOfBotsJSON[i].weapons, 
+			defense :  arrayOfBotsJSON[i].defenses
 		  };	
   		arrayOfBots[i] = objToWrite;
 	}
 	return arrayOfBots;
 }
-
-function createStaticBots()
-{
-	var arrayOfBots = new Array();
-	
-	for (var i = 0; i <= 4; i++) {
-		var objToWrite = {
-			money : 100 * i,
-			rank : i * 2,
-			displayName : 'Bot ' + i,
-			serverName : 'Bot' + i,
-			fbImageUrl : '',
-			status : 'A',
-			bot : 1,
-			sessionId : 'qwertyuio',
-			duelsWin : i,
-			duelsLost : 4 - i  
-		  };	
-  		arrayOfBots[i] = objToWrite;
-	}
-	return arrayOfBots;
-}
-
 
 function addBotsToArray(array){
 	arrayOfBots = createBots();

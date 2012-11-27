@@ -1,5 +1,7 @@
 var botsList = require('./botsList');
 
+var gameKey = 'ver2.2';
+
 function convert(array, currentServer){
 	var arrayForJson = new Array();
 	array = botsList.addBotsToArray(array);
@@ -7,20 +9,37 @@ function convert(array, currentServer){
 	for (var i = 0; i < array.length; i++) {
 		var tmp = array[i];
 		if (tmp){
-			var objToWrite = {
-				money : tmp.money,
-				rank : tmp.rank,
-				displayName : tmp.displayName,
-				serverName : tmp.serverName,
-				fbImageUrl : tmp.fbImageUrl,
-				status : tmp.status,
-				bot : tmp.bot,
-				sessionId : tmp.sessionId,
-				duelsWin : tmp.duelsWin,
-				duelsLost : tmp.duelsLost
-		  	};		
-  		  	arrayForJson[i] = objToWrite;
-  		  	
+			if((currentServer) && (gameKey === currentServer.gameKey)){
+				var objToWrite = {
+					money : tmp.money,
+					rank : tmp.rank,
+					displayName : tmp.displayName,
+					serverName : tmp.serverName,
+					fbImageUrl : tmp.fbImageUrl,
+					status : tmp.status,
+					bot : tmp.bot,
+					sessionId : tmp.sessionId,
+					duelsWin : tmp.duelsWin,
+					duelsLost : tmp.duelsLost,
+					weapon : tmp.weapon, 
+					defense : tmp.defense
+		  		};		
+  		  		arrayForJson[i] = objToWrite;
+  		 } else{
+  		 	var objToWrite = {
+					money : tmp.money,
+					rank : tmp.rank,
+					displayName : tmp.displayName,
+					serverName : tmp.serverName,
+					fbImageUrl : tmp.fbImageUrl,
+					status : tmp.status,
+					bot : tmp.bot,
+					sessionId : tmp.sessionId,
+					duelsWin : tmp.duelsWin,
+					duelsLost : tmp.duelsLost
+		  		};		
+  		  		arrayForJson[i] = objToWrite;
+  		 }
   		} else {
   			arrayForJson[i] = null;
   		}

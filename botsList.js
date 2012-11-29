@@ -40,8 +40,8 @@ function createBots()
 			sessionId : arrayOfBotsJSON[i].session_id,
 			duelsWin : arrayOfBotsJSON[i].duels_win,
 			duelsLost : arrayOfBotsJSON[i].duels_lost,
-			weapon :  arrayOfBotsJSON[i].weapons, 
-			defense :  arrayOfBotsJSON[i].defenses
+			weapon :  arrayOfBotsJSON[i].weapons.id, 
+			defense :  arrayOfBotsJSON[i].defenses.value
 		  };	
   		arrayOfBots[i] = objToWrite;
 	}

@@ -128,12 +128,7 @@ function removeServerFromList(server)
    var index;
    index = connections.indexOf(server);
    console.log('Remove server at index ' + index);
-   console.log('List of servers before delete ' + converter.convert(connections, server));
-   
    if (index > -1)  connections.splice(index, 1);
-   
-   console.log('List of servers after delete ' + converter.convert(connections, server));
-   
 }
 
 
@@ -205,6 +200,8 @@ function processDataFromSocket(data, sock)
       console.log('set pair socket ' + data.toString('utf8', 4));
       var name = data.toString('utf8', 4);
       var tempServer = serverForSocket(sock);
+      
+      //set new pair
       var pairServer = serverForName(name);
       
       if (pairServer) {
@@ -291,11 +288,39 @@ function processDataFromSocket(data, sock)
                     console.log('There is err occured: ' + err.message);
                 }
             }
-                   else console.log('pair socket does not set');    
+                   else{ 
+                   	console.log('pair socket does not set');  
+                   	var discPacket = new Buffer(4);
+            			discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
+            			tempServer.status = 'A';
+            			try{
+              			tempServer.socket.write(discPacket);
+            			}catch(err){
+               			console.log('There is err occured: ' + err.message);
+            			} 
+                   } 
   }else if (data.readInt8(0) == packetCodes.NETWORK_SET_UNAVIBLE){
         try {
             tempServer = serverForSocket(sock);
             tempServer.status = 'B';
+            
+            //destroy old pair
+      if (tempServer)
+      if (tempServer.pairSocket){
+        // sending that we were disconnected to other side:
+        
+
+        var pairServer = serverForSocket(tempServer.pairSocket);
+        try {
+            destroyPairSocket(pairServer);
+        }catch(err){
+               console.log('There is err on NETWORK_DISCONNECT_PAIR getted: ' + err.message);
+           } 
+        
+        
+        
+      }
+      else console.log('pair socket does not set');  
         }catch(err){
                console.log('There is err getted: ' + err.message);
            } 

@@ -51,12 +51,16 @@ function createBots()
 function addBotsToArray(array){
 	arrayOfBots = createBots();
 	var arrayWithBots = new Array();
-	for (var i = 0; i < array.length; i++) {
+	
+	var listSize = 10;
+	if(array.length < listSize) listSize = array.length;
+	
+	for (var i = 0; i < listSize; i++) {
 				
   		  	arrayWithBots[i] = array[i];
   		  	
   		} 
-	for (var i = array.length; i < arrayOfBots.length; i++) {
+	for (var i = array.length; i < 4; i++) {
 				
   		  	arrayWithBots[i] = arrayOfBots[i];
   		  	

@@ -1,5 +1,7 @@
 var http = require('http');
 
+var randomIndexes;
+
 var arrayOfBotsJSON = new Array();
 
 var options = {
@@ -51,6 +53,33 @@ function createBots()
 function addBotsToArray(array){
 	arrayOfBots = createBots();
 	var arrayWithBots = new Array();
+	var index = 0;
+	randomIndexes = new Array();
+	for (var i = 0; i < 200; i++)
+    		{
+    			var tempIndex = Math.floor((Math.random()*arrayOfBots.length));
+    			var isInRandomIndexes = false;
+    			
+    			console.log('random numbers ' + tempIndex);
+
+    			if(i != 0){
+    				for (var j = 0; j < randomIndexes.length; j++)
+    				{
+    					console.log('random numbers randomIndexes ' + randomIndexes[j] + ' tempIndex ' + tempIndex);
+    					if (randomIndexes[j] == tempIndex) {
+    						isInRandomIndexes = true;
+    						console.log('isInRandomIndexes = true');
+    						break;
+    					}
+    				}
+    			}
+    			if (!isInRandomIndexes) {
+    				randomIndexes[index] = tempIndex;
+    				index++;
+    			}
+    			if(randomIndexes.length == arrayOfBots.length) break;
+    		}
+    		console.log('random numbers array' + randomIndexes);
 	
 	var listSize = 10;
 	if(array.length < listSize) listSize = array.length;
@@ -62,7 +91,7 @@ function addBotsToArray(array){
   		} 
 	for (var i = array.length; i < 4; i++) {
 				
-  		  	arrayWithBots[i] = arrayOfBots[i];
+  		  	arrayWithBots[i] = arrayOfBots[randomIndexes[i]];
   		  	
   		} 
 	return arrayWithBots;

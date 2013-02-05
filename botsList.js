@@ -60,15 +60,11 @@ function addBotsToArray(array){
     			var tempIndex = Math.floor((Math.random()*arrayOfBots.length));
     			var isInRandomIndexes = false;
     			
-    			console.log('random numbers ' + tempIndex);
-
     			if(i != 0){
     				for (var j = 0; j < randomIndexes.length; j++)
     				{
-    					console.log('random numbers randomIndexes ' + randomIndexes[j] + ' tempIndex ' + tempIndex);
     					if (randomIndexes[j] == tempIndex) {
     						isInRandomIndexes = true;
-    						console.log('isInRandomIndexes = true');
     						break;
     					}
     				}
@@ -79,8 +75,6 @@ function addBotsToArray(array){
     			}
     			if(randomIndexes.length == arrayOfBots.length) break;
     		}
-    		console.log('random numbers array' + randomIndexes);
-	
 	var listSize = 10;
 	if(array.length < listSize) listSize = array.length;
 	

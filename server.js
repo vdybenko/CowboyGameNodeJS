@@ -163,13 +163,13 @@ function processDataFromSocket(data, sock)
       var nameLen = data.readInt8(16+displayNameLen,4);
       server.serverName = data.toString('utf8', 20+displayNameLen, 20+displayNameLen+nameLen);
       
-      var clientVersion = data.toString('utf8', data.length - 6, data.length);
+      //var clientVersion = data.toString('utf8', data.length - 6, data.length);
       
-      if (clientVersion === gameKey) {
-      	console.log('version key: ver2.2');
+      //if (clientVersion === gameKey) {
+      //	console.log('version key: ver2.2');
       	server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length - 6);
-      	server.gameKey = clientVersion;
-      }else server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
+      //	server.gameKey = clientVersion;
+      //}else server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
       
       server.status = "A";
        //server.gameKey = 
@@ -177,13 +177,12 @@ function processDataFromSocket(data, sock)
       console.log('name: '+server.serverName+' displayName: '+server.displayName);
       console.log('url: '+server.fbImageUrl);
   } else if (data.readInt8(0) == packetCodes.NETWORK_GET_LIST_ONLINE){  //list online
-      console.log('connections ' + connections);
       // sending list of servers:
       try{
       var tempServer = serverForSocket(sock);
       //console.log('curr '+tempServer.displayName);
       var listOfServers = converter.convert(connections, tempServer);
-      console.log('list: '+listOfServers);
+      console.log('receiver ' + tempServer.serverName + ' list: ' + listOfServers);
       // form data to send:
       var dataOfListBuffer = new Buffer (Buffer.byteLength(listOfServers, encoding='utf8')+1);
       dataOfListBuffer[0] = packetCodes.NETWORK_GET_LIST_ONLINE;
@@ -237,7 +236,12 @@ function processDataFromSocket(data, sock)
       else {
           var discPacket = new Buffer(4);
           discPacket[0] = packetCodes.NETWORK_PAIR_SET_FALSE;
-          tempServer.status = 'A';
+          try{
+              tempServer.status = 'A';
+            }catch(err){
+               console.log('There is err occured: ' + err.message);
+            }
+          
           try{
               tempServer.socket.write(discPacket);
             }catch(err){
@@ -316,8 +320,6 @@ function processDataFromSocket(data, sock)
         }catch(err){
                console.log('There is err on NETWORK_DISCONNECT_PAIR getted: ' + err.message);
            } 
-        
-        
         
       }
       else console.log('pair socket does not set');  

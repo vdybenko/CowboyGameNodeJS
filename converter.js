@@ -9,7 +9,7 @@ function convert(array, currentServer){
 	for (var i = 0; i < array.length; i++) {
 		var tmp = array[i];
 		if (tmp){
-			if((currentServer) && (gameKey === currentServer.gameKey)){
+			//if((currentServer) && (gameKey === currentServer.gameKey)){
 				var objToWrite = {
 					money : tmp.money,
 					rank : tmp.rank,
@@ -25,21 +25,21 @@ function convert(array, currentServer){
 					defense : tmp.defense
 		  		};		
   		  		arrayForJson[i] = objToWrite;
-  		 } else{
-  		 	var objToWrite = {
-					money : tmp.money,
-					rank : tmp.rank,
-					displayName : tmp.displayName,
-					serverName : tmp.serverName,
-					fbImageUrl : tmp.fbImageUrl,
-					status : tmp.status,
-					bot : tmp.bot,
-					sessionId : tmp.sessionId,
-					duelsWin : tmp.duelsWin,
-					duelsLost : tmp.duelsLost
-		  		};		
-  		  		arrayForJson[i] = objToWrite;
-  		 }
+  		 // } else{
+  		 	// var objToWrite = {
+					// money : tmp.money,
+					// rank : tmp.rank,
+					// displayName : tmp.displayName,
+					// serverName : tmp.serverName,
+					// fbImageUrl : tmp.fbImageUrl,
+					// status : tmp.status,
+					// bot : tmp.bot,
+					// sessionId : tmp.sessionId,
+					// duelsWin : tmp.duelsWin,
+					// duelsLost : tmp.duelsLost
+		  		// };		
+  		  		// arrayForJson[i] = objToWrite;
+  		 // }
   		} else {
   			arrayForJson[i] = null;
   		}

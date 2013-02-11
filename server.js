@@ -2,7 +2,7 @@ var net = require('net');
 var converter = require('./converter');
 var botsList = require('./botsList');
 
-var gameKey = 'ver2.2';
+var gameKey = 'ver3.1';
 
 var connections = new Array();
 var PORT = 8888;
@@ -140,6 +140,7 @@ function processDataFromSocket(data, sock)
    // console.log('get ping packet'); 
   } else if (data.readInt8(0) == packetCodes.NETWORK_POST_INFO){  //init info
       console.log('data info ' + data.toString('utf8', 0, data.length));
+      var readIndex = 4;
       var serverExist;
       var server = serverForSocket(sock);
       
@@ -150,26 +151,38 @@ function processDataFromSocket(data, sock)
       
       server.socket = sock;
       
-      var money = data.readInt32LE(4,4);
+      var money = data.readInt32LE(readIndex,4);
+      readIndex += 4;
       console.log('money ' + money);
       if (money < 0) money = 0;
       
       server.money = money;
-      server.rank = data.readInt8(8,4);
-      server.gameKey = '';
-      var displayNameLen = data.readInt8(12,4);
-      server.displayName = data.toString('utf8', 16, 16+displayNameLen);
+      server.rank = data.readInt8(readIndex,4);
+      readIndex += 4;
 
-      var nameLen = data.readInt8(16+displayNameLen,4);
-      server.serverName = data.toString('utf8', 20+displayNameLen, 20+displayNameLen+nameLen);
+	 var clientVersion = data.toString('utf8', data.length - 6, data.length);
       
-      //var clientVersion = data.toString('utf8', data.length - 6, data.length);
+      if (clientVersion === gameKey) {
+      	server.gameKey = clientVersion;
+      	server.weapon = data.readInt8(readIndex,4);
+      	readIndex += 4;
+      	server.defense = data.readInt8(readIndex,4);
+      	readIndex += 4;
+      	
+      	console.log('player weapon ' + server.weapon + ' and defence ' + server.defense);
+      }
+
+      var displayNameLen = data.readInt8(readIndex,4);
+      readIndex += 4;
+      server.displayName = data.toString('utf8', readIndex, readIndex+displayNameLen);
+	  readIndex += displayNameLen;
+
+      var nameLen = data.readInt8(readIndex,4);
+      readIndex += 4; 
+      server.serverName = data.toString('utf8', readIndex, readIndex+nameLen);
+      readIndex += nameLen;
       
-      //if (clientVersion === gameKey) {
-      //	console.log('version key: ver2.2');
-      	server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length - 6);
-      //	server.gameKey = clientVersion;
-      //}else server.fbImageUrl = data.toString('utf8', 20+displayNameLen+nameLen, data.length);
+      server.fbImageUrl = data.toString('utf8', readIndex, data.length - 6);
       
       server.status = "A";
        //server.gameKey = 

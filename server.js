@@ -238,10 +238,15 @@ function processDataFromSocket(data, sock)
             }
         
         
-        pairServer.pairSocket = sock;
-        pairServer.status = 'B';
-        tempServer.pairSocket = pairServer.socket;
-        tempServer.status = 'B';
+        try{
+            pairServer.pairSocket = sock;
+        	pairServer.status = 'B';
+        	tempServer.pairSocket = pairServer.socket;
+        	tempServer.status = 'B';
+        }catch(err){
+            console.log('There is err occured: ' + err.message);
+        }
+        
         console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
         console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
         console.log('They are: '+ tempServer.status+ ' && '+pairServer.status + ' now ');

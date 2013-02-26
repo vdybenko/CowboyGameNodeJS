@@ -247,9 +247,14 @@ function processDataFromSocket(data, sock)
             console.log('There is err occured: ' + err.message);
         }
         
-        console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
-        console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
-        console.log('They are: '+ tempServer.status+ ' && '+pairServer.status + ' now ');
+        try{
+        	console.log('Pair '+tempServer.displayName + ' && ' + pairServer.displayName + ' setted');
+        	console.log('i.e. '+tempServer.serverName + ' && ' + pairServer.serverName + ' setted');
+        	console.log('They are: '+ tempServer.status+ ' && '+pairServer.status + ' now ');
+        }catch(err){
+        	console.log('There is err occured: ' + err.message);
+        }
+        	
       }
       else {
           var discPacket = new Buffer(4);

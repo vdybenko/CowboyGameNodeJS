@@ -182,7 +182,14 @@ function processDataFromSocket(data, sock)
       server.serverName = data.toString('utf8', readIndex, readIndex+nameLen);
       readIndex += nameLen;
       
-      server.fbImageUrl = data.toString('utf8', readIndex, data.length - 6);
+      server.fbImageUrl = '';
+      
+      try{
+             server.fbImageUrl = data.toString('utf8', readIndex, data.length - 6);
+         }catch(err){
+             console.log('There is err occured: ' + err.message);
+         }
+      
       
       server.status = "A";
        //server.gameKey = 

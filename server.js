@@ -2,8 +2,11 @@ var net = require('net');
 
 var connections = new Array();
 
+//Use your own IP
 var HOST = '192.168.0.16';
 var PORT = 6969;
+
+var terrarium = 'Horda';
 
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
